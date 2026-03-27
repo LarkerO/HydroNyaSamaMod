@@ -1,11 +1,12 @@
 package cn.hydcraft.hydronyasama.objrender.fabric.v118;
 
+import com.google.common.base.Suppliers;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
+import net.fabricmc.fabric.api.renderer.v1.model.ModelHelper;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -24,6 +25,7 @@ final class CombinedObjBakedModel118 implements BakedModel, FabricBakedModel {
   private final List<BakedModel> delegates;
   private final List<FabricBakedModel> fabricDelegates;
   private final TextureAtlasSprite particle;
+  private final Supplier<List<BakedQuad>[]> combinedQuadCache;
 
   CombinedObjBakedModel118(List<BakedModel> delegates) {
     this.delegates = List.copyOf(delegates);
@@ -33,6 +35,7 @@ final class CombinedObjBakedModel118 implements BakedModel, FabricBakedModel {
     }
     this.fabricDelegates = List.copyOf(fabrics);
     this.particle = this.delegates.get(0).getParticleIcon();
+    this.combinedQuadCache = Suppliers.memoize(this::buildCombinedQuads);
   }
 
   @Override
@@ -63,11 +66,22 @@ final class CombinedObjBakedModel118 implements BakedModel, FabricBakedModel {
   @Override
   public @NotNull List<BakedQuad> getQuads(
       @Nullable BlockState blockState, @Nullable Direction direction, Random randomSource) {
-    List<BakedQuad> all = new ArrayList<>();
-    for (BakedModel delegate : delegates) {
-      all.addAll(delegate.getQuads(blockState, direction, randomSource));
+    return combinedQuadCache.get()[ModelHelper.toFaceIndex(direction)];
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<BakedQuad>[] buildCombinedQuads() {
+    List<BakedQuad>[] result = new List[7];
+    for (int i = 0; i < 7; i++) {
+      Direction dir = ModelHelper.faceFromIndex(i);
+      Random random = new Random();
+      List<BakedQuad> all = new ArrayList<>();
+      for (BakedModel delegate : delegates) {
+        all.addAll(delegate.getQuads(null, dir, random));
+      }
+      result[i] = all.isEmpty() ? List.of() : List.copyOf(all);
     }
-    return all.isEmpty() ? Collections.emptyList() : all;
+    return result;
   }
 
   @Override
