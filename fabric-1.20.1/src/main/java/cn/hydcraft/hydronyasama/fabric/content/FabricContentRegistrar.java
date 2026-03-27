@@ -65,6 +65,9 @@ public final class FabricContentRegistrar implements ContentRegistrar {
   public static final ResourceKey<CreativeModeTab> TAB_TELECOM_KEY =
       ResourceKey.create(
           Registries.CREATIVE_MODE_TAB, new ResourceLocation(ModContent.MOD_GROUP_ID, "telecom"));
+  public static final ResourceKey<CreativeModeTab> TAB_RAILWAY_KEY =
+      ResourceKey.create(
+          Registries.CREATIVE_MODE_TAB, new ResourceLocation(ModContent.MOD_GROUP_ID, "railway"));
 
   static {
     Registry.register(
@@ -122,6 +125,17 @@ public final class FabricContentRegistrar implements ContentRegistrar {
                         BuiltInRegistries.ITEM.get(
                             new ResourceLocation(ModContent.MOD_GROUP_ID, "signal_box"))))
             .title(Component.translatable("itemGroup." + ModContent.MOD_GROUP_ID + ".telecom"))
+            .build());
+    Registry.register(
+        BuiltInRegistries.CREATIVE_MODE_TAB,
+        TAB_RAILWAY_KEY,
+        FabricItemGroup.builder()
+            .icon(
+                () ->
+                    new ItemStack(
+                        BuiltInRegistries.ITEM.get(
+                            new ResourceLocation(ModContent.MOD_GROUP_ID, "rail_stone_sleeper"))))
+            .title(Component.translatable("itemGroup." + ModContent.MOD_GROUP_ID + ".railway"))
             .build());
   }
 
@@ -265,6 +279,8 @@ public final class FabricContentRegistrar implements ContentRegistrar {
       tabKey = TAB_OPTICS_KEY;
     } else if ("telecom".equals(definition.contentGroup)) {
       tabKey = TAB_TELECOM_KEY;
+    } else if ("railway".equals(definition.contentGroup)) {
+      tabKey = TAB_RAILWAY_KEY;
     } else {
       tabKey = TAB_CORE_KEY; // Fallback
     }
@@ -354,6 +370,8 @@ public final class FabricContentRegistrar implements ContentRegistrar {
                 .OAK); // 1.20 requires WoodType
       case "pane":
         return new IronBarsBlock(props) {};
+      case "rail":
+        return new Block(props.noOcclusion().noCollission());
       default:
         // Fallback for unknown kinds (like custom ones) to simple block to avoid crash
         return new Block(props);

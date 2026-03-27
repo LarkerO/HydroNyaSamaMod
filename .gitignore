@@ -23,8 +23,10 @@ classes/
 *.iws
 *.log
 *.tmp
+.tmp_*
 *.swp
 *.bak
+*.ps1
 Thumbs.db
 .DS_Store
 checkouts/

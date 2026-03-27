@@ -4,6 +4,7 @@ import cn.hydcraft.hydronyasama.building.content.BuildingContent;
 import cn.hydcraft.hydronyasama.core.registry.ContentRegistrar;
 import cn.hydcraft.hydronyasama.electricity.content.ElectricityContent;
 import cn.hydcraft.hydronyasama.optics.content.OpticsContent;
+import cn.hydcraft.hydronyasama.railway.content.RailwayContent;
 import cn.hydcraft.hydronyasama.telecom.content.TelecomContent;
 
 public final class ModContent {
@@ -18,5 +19,6 @@ public final class ModContent {
     ElectricityContent.register(registrar);
     OpticsContent.register(registrar);
     TelecomContent.register(registrar);
+    RailwayContent.register(registrar);
   }
 }

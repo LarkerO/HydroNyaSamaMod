@@ -45,6 +45,14 @@ final class ForgeCreativeTabs {
           return stack.isEmpty() ? new ItemStack(Items.BRICK) : stack;
         }
       };
+  static final CreativeModeTab HYDRONYASAMA_RAILWAY =
+      new CreativeModeTab(CreativeModeTab.TABS.length + 5, "hydronyasama_railway") {
+        @Override
+        public ItemStack makeIcon() {
+          ItemStack stack = ForgeContentRegistry.railwayIcon();
+          return stack.isEmpty() ? new ItemStack(Items.BRICK) : stack;
+        }
+      };
 
   private ForgeCreativeTabs() {}
 
@@ -54,5 +62,6 @@ final class ForgeCreativeTabs {
     HYDRONYASAMA_ELECTRICITY.getRecipeFolderName();
     HYDRONYASAMA_OPTICS.getRecipeFolderName();
     HYDRONYASAMA_TELECOM.getRecipeFolderName();
+    HYDRONYASAMA_RAILWAY.getRecipeFolderName();
   }
 }

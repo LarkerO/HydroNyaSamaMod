@@ -40,6 +40,7 @@ final class ForgeContentRegistry {
   private static final List<RegistryObject<Item>> ELECTRICITY_TAB_ITEMS = new ArrayList<>();
   private static final List<RegistryObject<Item>> OPTICS_TAB_ITEMS = new ArrayList<>();
   private static final List<RegistryObject<Item>> TELECOM_TAB_ITEMS = new ArrayList<>();
+  private static final List<RegistryObject<Item>> RAILWAY_TAB_ITEMS = new ArrayList<>();
   private static final List<RegistryObject<Block>> TELECOM_RENDER_BLOCKS = new ArrayList<>();
   private static final List<RegistryObject<Block>> OPTICS_TEXT_BLOCKS = new ArrayList<>();
   private static final Set<String> OPTICS_OBJ_BLOCK_IDS =
@@ -109,6 +110,9 @@ final class ForgeContentRegistry {
     }
     for (String id : LegacyContentIds.TELECOM_BLOCK_IDS) {
       registerTelecomBlock(id, TELECOM_TAB_ITEMS);
+    }
+    for (String id : LegacyContentIds.RAILWAY_BLOCK_IDS) {
+      registerRailwayBlock(id, RAILWAY_TAB_ITEMS);
     }
     telecomRenderBlockEntityType =
         BLOCK_ENTITY_TYPES.register(
@@ -180,6 +184,10 @@ final class ForgeContentRegistry {
     return Collections.unmodifiableList(TELECOM_TAB_ITEMS);
   }
 
+  static List<RegistryObject<Item>> railwayTabItems() {
+    return Collections.unmodifiableList(RAILWAY_TAB_ITEMS);
+  }
+
   static Item coreIconItem() {
     return CORE_TAB_ITEMS.isEmpty() ? Items.BRICK : CORE_TAB_ITEMS.get(0).get();
   }
@@ -198,6 +206,10 @@ final class ForgeContentRegistry {
 
   static Item telecomIconItem() {
     return TELECOM_TAB_ITEMS.isEmpty() ? Items.BRICK : TELECOM_TAB_ITEMS.get(0).get();
+  }
+
+  static Item railwayIconItem() {
+    return RAILWAY_TAB_ITEMS.isEmpty() ? Items.BRICK : RAILWAY_TAB_ITEMS.get(0).get();
   }
 
   static Item probeItem() {
@@ -243,6 +255,20 @@ final class ForgeContentRegistry {
     RegistryObject<Item> item =
         ITEMS.register(id, () -> new BlockItem(block.get(), new Item.Properties()));
     TELECOM_RENDER_BLOCKS.add(block);
+    tabItems.add(item);
+  }
+
+  private static void registerRailwayBlock(String id, List<RegistryObject<Item>> tabItems) {
+    RegistryObject<Block> block =
+        BLOCKS.register(
+            id,
+            () ->
+                new Block(
+                    BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                        .noOcclusion()
+                        .noCollission()));
+    RegistryObject<Item> item =
+        ITEMS.register(id, () -> new BlockItem(block.get(), new Item.Properties()));
     tabItems.add(item);
   }
 
@@ -306,6 +332,9 @@ final class ForgeContentRegistry {
     }
     if (id.endsWith("_fence")) {
       return new FenceBlock(properties);
+    }
+    if (id.endsWith("_rail")) {
+      return new Block(properties.noOcclusion().noCollission());
     }
     return new Block(properties);
   }

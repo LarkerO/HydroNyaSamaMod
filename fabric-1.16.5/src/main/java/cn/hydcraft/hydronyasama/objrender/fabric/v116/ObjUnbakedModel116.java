@@ -49,14 +49,23 @@ public final class ObjUnbakedModel116 implements UnbakedModel {
   private static final Material MISSING_MATERIAL =
       new Material(InventoryMenu.BLOCK_ATLAS, MissingTextureAtlasSprite.getLocation());
 
+  private static final int[] FACE_ORDER = {0, 1, 2, 3};
+  private static final int[] FACE_ORDER_REVERSED = {3, 2, 1, 0};
+
   private final Obj obj;
   private final Map<String, Mtl> mtlMap;
   private final ObjModelOption116 option;
+  private final Map<String, Obj> materialGroups;
+  private final Map<String, Material> resolvedMaterialCache;
+  private final int rotDeg;
 
   private ObjUnbakedModel116(Obj obj, Map<String, Mtl> mtlMap, ObjModelOption116 option) {
     this.obj = obj;
     this.mtlMap = mtlMap;
     this.option = option;
+    this.materialGroups = ObjSplitting.splitByMaterialGroups(obj);
+    this.resolvedMaterialCache = buildMaterialCache(mtlMap, option);
+    this.rotDeg = Math.floorMod(option.rotateY(), 360);
   }
 
   public static @Nullable UnbakedModel tryLoad(
@@ -212,8 +221,7 @@ public final class ObjUnbakedModel116 implements UnbakedModel {
     QuadEmitter emitter = builder.getEmitter();
     Material particleMaterial = getParticleMaterial();
 
-    Map<String, Obj> materialGroups = ObjSplitting.splitByMaterialGroups(obj);
-    materialGroups.forEach(
+    this.materialGroups.forEach(
         (materialName, groupObj) -> {
           for (int i = 0; i < groupObj.getNumFaces(); i++) {
             emitFace(
@@ -289,25 +297,39 @@ public final class ObjUnbakedModel116 implements UnbakedModel {
   }
 
   private static int mappedFaceVertex(int emitIndex, ObjFace face, boolean reverse) {
-    int[] order = reverse ? new int[] {3, 2, 1, 0} : new int[] {0, 1, 2, 3};
-    int idx = order[emitIndex];
+    int idx = (reverse ? FACE_ORDER_REVERSED : FACE_ORDER)[emitIndex];
     return idx >= face.getNumVertices() ? 2 : idx;
   }
 
   private Material getMaterialTexture(String materialName, Material particleMaterial) {
-    ResourceLocation overrideTexture = option.materialTextures().get(materialName);
-    if (overrideTexture != null) {
-      return new Material(InventoryMenu.BLOCK_ATLAS, overrideTexture);
+    Material cached = resolvedMaterialCache.get(materialName);
+    return cached != null ? cached : particleMaterial;
+  }
+
+  private static Map<String, Material> buildMaterialCache(
+      Map<String, Mtl> mtlMap, ObjModelOption116 option) {
+    Map<String, Material> cache = new HashMap<>();
+    for (Map.Entry<String, Mtl> entry : mtlMap.entrySet()) {
+      String name = entry.getKey();
+      ResourceLocation overrideTexture = option.materialTextures().get(name);
+      if (overrideTexture != null) {
+        cache.put(name, new Material(InventoryMenu.BLOCK_ATLAS, overrideTexture));
+        continue;
+      }
+      Mtl mtl = entry.getValue();
+      if (mtl != null && mtl.getMapKd() != null && !mtl.getMapKd().trim().isEmpty()) {
+        String texturePath = normalizeTexturePath(mtl.getMapKd());
+        if (texturePath != null) {
+          cache.put(name, new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(texturePath)));
+        }
+      }
     }
-    Mtl mtl = mtlMap.get(materialName);
-    if (mtl == null || mtl.getMapKd() == null || mtl.getMapKd().trim().isEmpty()) {
-      return particleMaterial;
+    for (Map.Entry<String, ResourceLocation> entry : option.materialTextures().entrySet()) {
+      if (!cache.containsKey(entry.getKey())) {
+        cache.put(entry.getKey(), new Material(InventoryMenu.BLOCK_ATLAS, entry.getValue()));
+      }
     }
-    String texturePath = normalizeTexturePath(mtl.getMapKd());
-    if (texturePath == null) {
-      return particleMaterial;
-    }
-    return new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(texturePath));
+    return cache;
   }
 
   private static @Nullable String normalizeTexturePath(String raw) {
@@ -345,10 +367,17 @@ public final class ObjUnbakedModel116 implements UnbakedModel {
     float x = vertexTuple.getX() / 16.0F + 0.5F;
     float y = vertexTuple.getY() / 16.0F + 0.5F;
     float z = vertexTuple.getZ() / 16.0F + 0.5F;
-    float[] rotated = rotateAroundCenterY(x, y, z, option.rotateY());
-    x = rotated[0];
-    y = rotated[1];
-    z = rotated[2];
+
+    if (rotDeg != 0) {
+      float lx = x - 0.5F;
+      float lz = z - 0.5F;
+      switch (rotDeg) {
+        case 90:  x = -lz + 0.5F; z = lx + 0.5F; break;
+        case 180: x = -lx + 0.5F; z = -lz + 0.5F; break;
+        case 270: x = lz + 0.5F;  z = -lx + 0.5F; break;
+        default: break;
+      }
+    }
     emitter.pos(emitIndex, x, y, z);
 
     if (face.containsNormalIndices()) {
@@ -356,15 +385,16 @@ public final class ObjUnbakedModel116 implements UnbakedModel {
       float nx = normalTuple.getX();
       float ny = normalTuple.getY();
       float nz = normalTuple.getZ();
-      if (reverse) {
-        nx = -nx;
-        ny = -ny;
-        nz = -nz;
+      if (reverse) { nx = -nx; ny = -ny; nz = -nz; }
+      if (rotDeg != 0) {
+        float ox = nx, oz = nz;
+        switch (rotDeg) {
+          case 90:  nx = -oz; nz = ox; break;
+          case 180: nx = -ox; nz = -oz; break;
+          case 270: nx = oz;  nz = -ox; break;
+          default: break;
+        }
       }
-      float[] rotatedNormal = rotateNormalY(nx, ny, nz, option.rotateY());
-      nx = rotatedNormal[0];
-      ny = rotatedNormal[1];
-      nz = rotatedNormal[2];
       emitter.normal(emitIndex, nx, ny, nz);
     } else {
       emitter.normal(emitIndex, 0.0F, reverse ? -1.0F : 1.0F, 0.0F);
@@ -375,51 +405,6 @@ public final class ObjUnbakedModel116 implements UnbakedModel {
       emitter.sprite(emitIndex, 0, new Vec2(uvTuple.getX(), uvTuple.getY()));
     } else {
       emitter.sprite(emitIndex, 0, Vec2.ZERO);
-    }
-  }
-
-  private static float[] rotateAroundCenterY(float x, float y, float z, int degrees) {
-    int normalized = Math.floorMod(degrees, 360);
-    if (normalized == 0) {
-      return new float[] {x, y, z};
-    }
-    float localX = x - 0.5F;
-    float localZ = z - 0.5F;
-    float rotatedX;
-    float rotatedZ;
-    switch (normalized) {
-      case 90:
-        rotatedX = -localZ;
-        rotatedZ = localX;
-        break;
-      case 180:
-        rotatedX = -localX;
-        rotatedZ = -localZ;
-        break;
-      case 270:
-        rotatedX = localZ;
-        rotatedZ = -localX;
-        break;
-      default:
-        return new float[] {x, y, z};
-    }
-    return new float[] {rotatedX + 0.5F, y, rotatedZ + 0.5F};
-  }
-
-  private static float[] rotateNormalY(float x, float y, float z, int degrees) {
-    int normalized = Math.floorMod(degrees, 360);
-    if (normalized == 0) {
-      return new float[] {x, y, z};
-    }
-    switch (normalized) {
-      case 90:
-        return new float[] {-z, y, x};
-      case 180:
-        return new float[] {-x, y, -z};
-      case 270:
-        return new float[] {z, y, -x};
-      default:
-        return new float[] {x, y, z};
     }
   }
 }
