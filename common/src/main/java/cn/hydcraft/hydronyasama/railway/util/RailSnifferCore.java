@@ -21,7 +21,7 @@ public final class RailSnifferCore {
             int val = Integer.parseInt(extInfo.trim());
             return Math.min(15, Math.max(0, val));
         } catch (NumberFormatException e) {
-            return extInfo.length() > 0 ? 1 : 0;
+            return 1;
         }
     }
 
