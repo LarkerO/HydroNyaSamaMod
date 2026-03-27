@@ -2,6 +2,7 @@ package cn.hydcraft.hydronyasama.railway.content;
 
 import cn.hydcraft.hydronyasama.core.registry.ContentId;
 import cn.hydcraft.hydronyasama.core.registry.ContentRegistrar;
+import cn.hydcraft.hydronyasama.railway.item.RailwayItems;
 import java.util.Arrays;
 import java.util.List;
 
@@ -209,6 +210,8 @@ public final class RailwayContent {
     for (String idPath : TEST_BLOCK_IDS) {
       registerCube(registrar, idPath);
     }
+
+    RailwayItems.register(registrar);
   }
 
   private static void registerObjCollision(
