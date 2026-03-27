@@ -177,8 +177,7 @@ public final class RailwayContent {
 
   // -- Test blocks (cube) ---------------------------------------------------------------
 
-  private static final List<String> TEST_BLOCK_IDS =
-      Arrays.asList("ns_test");
+  private static final List<String> TEST_BLOCK_IDS = Arrays.asList("ns_test");
 
   private RailwayContent() {}
 

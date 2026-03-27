@@ -286,7 +286,8 @@ public final class ObjUnbakedModel120 implements UnbakedModel {
       if (mtl != null && mtl.getMapKd() != null && !mtl.getMapKd().isBlank()) {
         String texturePath = normalizeTexturePath(mtl.getMapKd());
         if (texturePath != null) {
-          cache.put(name, new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(texturePath)));
+          cache.put(
+              name, new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(texturePath)));
         }
       }
     }

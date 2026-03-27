@@ -24,7 +24,8 @@ public final class OpticsLegacyService {
   private final Map<String, Integer> colorByEndpoint = new HashMap<String, Integer>();
   private final Map<String, Integer> backColorByEndpoint = new HashMap<String, Integer>();
   private final Map<String, Double> powerByEndpoint = new HashMap<String, Double>();
-  private final Map<String, TileRendererProfile> rendererByType = new HashMap<String, TileRendererProfile>();
+  private final Map<String, TileRendererProfile> rendererByType =
+      new HashMap<String, TileRendererProfile>();
 
   private OpticsLegacyService() {
     rendererByType.put("ad_board", new AdBoardRenderer());

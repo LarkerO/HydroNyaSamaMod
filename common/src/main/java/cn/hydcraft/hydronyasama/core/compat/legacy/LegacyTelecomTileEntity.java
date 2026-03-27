@@ -58,7 +58,8 @@ public abstract class LegacyTelecomTileEntity {
     return service.connect(endpoint, blockPath, target.endpoint(), target.blockPath());
   }
 
-  public final TelecomCommService.ConnectResult connectTo(String targetEndpoint, String targetBlock) {
+  public final TelecomCommService.ConnectResult connectTo(
+      String targetEndpoint, String targetBlock) {
     return service.connect(endpoint, blockPath, targetEndpoint, targetBlock);
   }
 

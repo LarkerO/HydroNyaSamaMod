@@ -10,6 +10,7 @@ public final class Dynamics {
   }
 
   public static double velocityDown(double velocity, double brakeResistance, double dt) {
-    return TrainPhysics.calcVelocityDown(velocity, 0.03D, 40000.0D, 25.0D, 0.8D, brakeResistance, dt);
+    return TrainPhysics.calcVelocityDown(
+        velocity, 0.03D, 40000.0D, 25.0D, 0.8D, brakeResistance, dt);
   }
 }
