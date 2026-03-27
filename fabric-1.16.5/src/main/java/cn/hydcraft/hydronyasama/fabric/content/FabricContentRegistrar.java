@@ -87,6 +87,14 @@ public final class FabricContentRegistrar implements ContentRegistrar {
                       Registry.ITEM.get(
                           new ResourceLocation(ModContent.MOD_GROUP_ID, "signal_box"))))
           .build();
+  public static final CreativeModeTab TAB_RAILWAY =
+      FabricItemGroupBuilder.create(new ResourceLocation(ModContent.MOD_GROUP_ID, "railway"))
+          .icon(
+              () ->
+                  new ItemStack(
+                      Registry.ITEM.get(
+                          new ResourceLocation(ModContent.MOD_GROUP_ID, "rail_stone_sleeper"))))
+          .build();
 
   private final Map<ContentId, Block> blockIndex = new HashMap<>();
   private static final java.util.List<Block> OPTICS_TEXT_BLOCKS = new java.util.ArrayList<>();
@@ -188,6 +196,8 @@ public final class FabricContentRegistrar implements ContentRegistrar {
       tab = TAB_OPTICS;
     } else if ("telecom".equals(definition.contentGroup)) {
       tab = TAB_TELECOM;
+    } else if ("railway".equals(definition.contentGroup)) {
+      tab = TAB_RAILWAY;
     } else {
       tab = TAB_CORE; // Fallback
     }
@@ -301,6 +311,8 @@ public final class FabricContentRegistrar implements ContentRegistrar {
         return new FenceGateBlock(props);
       case "pane":
         return new IronBarsBlock(props) {};
+      case "rail":
+        return new Block(props.noOcclusion().noCollission());
       default:
         // Fallback for unknown kinds (like custom ones) to simple block to avoid crash
         return new Block(props);

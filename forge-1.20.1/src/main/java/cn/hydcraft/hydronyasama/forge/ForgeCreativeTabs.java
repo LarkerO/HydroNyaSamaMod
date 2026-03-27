@@ -88,6 +88,21 @@ final class ForgeCreativeTabs {
                       })
                   .build());
 
+  static final RegistryObject<CreativeModeTab> HYDRONYASAMA_RAILWAY =
+      CREATIVE_TABS.register(
+          "hydronyasama_railway",
+          () ->
+              CreativeModeTab.builder()
+                  .title(Component.translatable("itemGroup.hydronyasama_railway"))
+                  .icon(() -> new ItemStack(ForgeContentRegistry.railwayIconItem()))
+                  .displayItems(
+                      (parameters, output) -> {
+                        for (var item : ForgeContentRegistry.railwayTabItems()) {
+                          output.accept(item.get());
+                        }
+                      })
+                  .build());
+
   private ForgeCreativeTabs() {}
 
   static void register(IEventBus modBus) {
@@ -97,5 +112,6 @@ final class ForgeCreativeTabs {
     HYDRONYASAMA_ELECTRICITY.getId();
     HYDRONYASAMA_OPTICS.getId();
     HYDRONYASAMA_TELECOM.getId();
+    HYDRONYASAMA_RAILWAY.getId();
   }
 }

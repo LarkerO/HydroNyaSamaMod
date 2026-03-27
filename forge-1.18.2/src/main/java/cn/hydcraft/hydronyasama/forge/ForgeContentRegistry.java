@@ -40,6 +40,7 @@ final class ForgeContentRegistry {
   private static final List<RegistryObject<Item>> ELECTRICITY_ITEMS = new ArrayList<>();
   private static final List<RegistryObject<Item>> OPTICS_ITEMS = new ArrayList<>();
   private static final List<RegistryObject<Item>> TELECOM_ITEMS = new ArrayList<>();
+  private static final List<RegistryObject<Item>> RAILWAY_ITEMS = new ArrayList<>();
   private static final List<RegistryObject<Block>> OPTICS_TEXT_BLOCKS = new ArrayList<>();
   private static final Set<String> OPTICS_OBJ_BLOCK_IDS =
       Collections.unmodifiableSet(
@@ -106,6 +107,9 @@ final class ForgeContentRegistry {
     }
     for (String id : LegacyContentIds.TELECOM_BLOCK_IDS) {
       registerTelecomBlock(id, ForgeCreativeTabs.HYDRONYASAMA_TELECOM, TELECOM_ITEMS);
+    }
+    for (String id : LegacyContentIds.RAILWAY_BLOCK_IDS) {
+      registerRailwayBlock(id, ForgeCreativeTabs.HYDRONYASAMA_RAILWAY, RAILWAY_ITEMS);
     }
     telecomNodeBlock =
         BLOCKS.register(
@@ -190,6 +194,10 @@ final class ForgeContentRegistry {
     return iconFor(TELECOM_ITEMS);
   }
 
+  static ItemStack railwayIcon() {
+    return iconFor(RAILWAY_ITEMS);
+  }
+
   static Item probeItem() {
     return probeItem == null ? Items.AIR : probeItem.get();
   }
@@ -267,6 +275,23 @@ final class ForgeContentRegistry {
     tabItems.add(item);
   }
 
+  private static void registerRailwayBlock(
+      String id,
+      net.minecraft.world.item.CreativeModeTab tab,
+      List<RegistryObject<Item>> tabItems) {
+    RegistryObject<Block> block =
+        BLOCKS.register(
+            id,
+            () ->
+                new Block(
+                    BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                        .noOcclusion()
+                        .noCollission()));
+    RegistryObject<Item> item =
+        ITEMS.register(id, () -> new BlockItem(block.get(), new Item.Properties().tab(tab)));
+    tabItems.add(item);
+  }
+
   private static Block createDerivedBlock(String id) {
     BlockBehaviour.Properties properties = BlockBehaviour.Properties.copy(Blocks.STONE);
     if (id.endsWith("_stairs")) {
@@ -307,6 +332,9 @@ final class ForgeContentRegistry {
     }
     if (id.endsWith("_fence")) {
       return new FenceBlock(properties);
+    }
+    if (id.endsWith("_rail")) {
+      return new Block(properties.noOcclusion().noCollission());
     }
     return new Block(properties);
   }
