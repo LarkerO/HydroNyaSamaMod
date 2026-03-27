@@ -128,36 +128,52 @@ public final class NtpMotion {
 
     // --- Internal physics formulas (ported from org.thewdj.physics.Dynamics.LocoMotions) ---
 
-    private static double calcVelocityUp(double v, double mass, double friction, double power, double dt) {
-        return v + (power - friction * v) / mass * dt;
+    private static double calcVelocityUp(
+            double velocity, double mass, double friction, double power, double deltaTime) {
+        return velocity + (power - friction * velocity) / mass * deltaTime;
     }
 
-    private static double calcVelocityDown(double v, double mass, double friction, double inductance, double resistance, double brakeRatio, double dt) {
-        double brakePower = inductance * v * brakeRatio;
+    /**
+     * Deceleration model with electromagnetic braking.
+     * resistiveLoss = resistance * brakeRatio is a constant braking force term
+     * (not velocity-proportional); this matches the original Dynamics.LocoMotions formula.
+     */
+    private static double calcVelocityDown(
+            double velocity, double mass, double friction,
+            double inductance, double resistance, double brakeRatio, double deltaTime) {
+        double brakePower = inductance * velocity * brakeRatio;
         double resistiveLoss = resistance * brakeRatio;
-        return v - (friction * v + brakePower + resistiveLoss) / mass * dt;
+        return velocity - (friction * velocity + brakePower + resistiveLoss) / mass * deltaTime;
     }
 
-    private static double calcVelocityUpWithAir(double v, double mass, double friction, double power, double dt) {
-        double airDrag = 0.01 * v * v;
-        return v + (power - friction * v - airDrag) / mass * dt;
+    private static double calcVelocityUpWithAir(
+            double velocity, double mass, double friction, double power, double deltaTime) {
+        double airDrag = 0.01 * velocity * velocity;
+        return velocity + (power - friction * velocity - airDrag) / mass * deltaTime;
     }
 
-    private static double calcVelocityDownWithAir(double v, double mass, double friction, double inductance, double resistance, double brakeRatio, double dt) {
-        double brakePower = inductance * v * brakeRatio;
+    private static double calcVelocityDownWithAir(
+            double velocity, double mass, double friction,
+            double inductance, double resistance, double brakeRatio, double deltaTime) {
+        double brakePower = inductance * velocity * brakeRatio;
         double resistiveLoss = resistance * brakeRatio;
-        double airDrag = 0.01 * v * v;
-        return v - (friction * v + brakePower + resistiveLoss + airDrag) / mass * dt;
+        double airDrag = 0.01 * velocity * velocity;
+        return velocity - (friction * velocity + brakePower + resistiveLoss + airDrag)
+                / mass * deltaTime;
     }
 
-    private static double calcWithEuler(double v, double power, double brakeRelease, double maxV, double dt) {
-        double target = power * maxV * brakeRelease;
-        return v + (target - v) * dt;
+    private static double calcWithEuler(
+            double velocity, double power, double brakeRelease, double maxVelocity,
+            double deltaTime) {
+        double target = power * maxVelocity * brakeRelease;
+        return velocity + (target - velocity) * deltaTime;
     }
 
-    private static double calcWithSlip(double v, double power, double brakeRelease, double maxV, double dt) {
-        double target = power * maxV * brakeRelease;
-        double slipFactor = v > 0.5 * maxV ? 0.8 : 1.0;
-        return v + (target - v) * dt * slipFactor;
+    private static double calcWithSlip(
+            double velocity, double power, double brakeRelease, double maxVelocity,
+            double deltaTime) {
+        double target = power * maxVelocity * brakeRelease;
+        double slipFactor = velocity > 0.5 * maxVelocity ? 0.8 : 1.0;
+        return velocity + (target - velocity) * deltaTime * slipFactor;
     }
 }
