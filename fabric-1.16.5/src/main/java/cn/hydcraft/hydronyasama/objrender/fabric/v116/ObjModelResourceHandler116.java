@@ -1,7 +1,6 @@
 package cn.hydcraft.hydronyasama.objrender.fabric.v116;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -317,10 +316,10 @@ public final class ObjModelResourceHandler116 implements ModelResourceProvider {
   }
 
   private static JsonObject copyJsonObject(JsonObject source) {
-    return new JsonParser().parse(source.toString()).getAsJsonObject();
+    return source.deepCopy();
   }
 
   private static com.google.gson.JsonElement copyJsonElement(com.google.gson.JsonElement source) {
-    return new JsonParser().parse(source.toString());
+    return source.deepCopy();
   }
 }
