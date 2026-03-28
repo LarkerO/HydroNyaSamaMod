@@ -4,6 +4,13 @@
 - Mark `[x]` only after in-game/manual validation passes.
 - `Status` is current migration mapping, not proof of behavior parity.
 - Keep evidence (screenshots/logs) for each checked item.
+- Build-time/JVM regression items may be checked separately, but they do not replace manual sign-off.
+
+## Automated JVM Regression (Build-Time Only)
+- [x] `./gradlew :common:test` covers `TelecomCommService` input/output link toggle + disconnect behavior.
+- [x] `./gradlew :common:test` covers `TelecomNgScriptEngine` NSPGA command flow (`nspga_io/inputs/outputs/code/show`) and snapshot output.
+- [x] `./gradlew :common:test` covers `TriStateSignalBox -> RSLatch -> Output` positive/negative edge regression.
+- [ ] Manual in-game scenarios below remain mandatory before final sign-off.
 
 ## Class-by-Class Checklist
 - [ ] `DeviceBase` (`Merged`): Infrastructure replaced by Architectury common+loader split or unified runtime interfaces.
@@ -109,5 +116,6 @@
 - [ ] Forge 1.20.1
 
 ## Final Gate
+- [x] `./gradlew :common:test`
 - [ ] `./gradlew.bat buildTarget_1_16_5 buildTarget_1_18_2 buildTarget_1_20_1`
 - [ ] This checklist +日报 updated in same commit.
