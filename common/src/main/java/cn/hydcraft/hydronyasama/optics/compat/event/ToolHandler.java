@@ -14,7 +14,8 @@ import java.util.function.Consumer;
 public final class ToolHandler {
   private static final ToolHandler INSTANCE = new ToolHandler();
 
-  private final CopyOnWriteArrayList<Consumer<String>> inspectCallbacks = new CopyOnWriteArrayList<>();
+  private final CopyOnWriteArrayList<Consumer<String>> inspectCallbacks =
+      new CopyOnWriteArrayList<>();
 
   private ToolHandler() {}
 

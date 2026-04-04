@@ -320,7 +320,8 @@ public final class ObjUnbakedModel116 implements UnbakedModel {
       if (mtl != null && mtl.getMapKd() != null && !mtl.getMapKd().trim().isEmpty()) {
         String texturePath = normalizeTexturePath(mtl.getMapKd());
         if (texturePath != null) {
-          cache.put(name, new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(texturePath)));
+          cache.put(
+              name, new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(texturePath)));
         }
       }
     }
@@ -372,10 +373,20 @@ public final class ObjUnbakedModel116 implements UnbakedModel {
       float lx = x - 0.5F;
       float lz = z - 0.5F;
       switch (rotDeg) {
-        case 90:  x = -lz + 0.5F; z = lx + 0.5F; break;
-        case 180: x = -lx + 0.5F; z = -lz + 0.5F; break;
-        case 270: x = lz + 0.5F;  z = -lx + 0.5F; break;
-        default: break;
+        case 90:
+          x = -lz + 0.5F;
+          z = lx + 0.5F;
+          break;
+        case 180:
+          x = -lx + 0.5F;
+          z = -lz + 0.5F;
+          break;
+        case 270:
+          x = lz + 0.5F;
+          z = -lx + 0.5F;
+          break;
+        default:
+          break;
       }
     }
     emitter.pos(emitIndex, x, y, z);
@@ -385,14 +396,28 @@ public final class ObjUnbakedModel116 implements UnbakedModel {
       float nx = normalTuple.getX();
       float ny = normalTuple.getY();
       float nz = normalTuple.getZ();
-      if (reverse) { nx = -nx; ny = -ny; nz = -nz; }
+      if (reverse) {
+        nx = -nx;
+        ny = -ny;
+        nz = -nz;
+      }
       if (rotDeg != 0) {
         float ox = nx, oz = nz;
         switch (rotDeg) {
-          case 90:  nx = -oz; nz = ox; break;
-          case 180: nx = -ox; nz = -oz; break;
-          case 270: nx = oz;  nz = -ox; break;
-          default: break;
+          case 90:
+            nx = -oz;
+            nz = ox;
+            break;
+          case 180:
+            nx = -ox;
+            nz = -oz;
+            break;
+          case 270:
+            nx = oz;
+            nz = -ox;
+            break;
+          default:
+            break;
         }
       }
       emitter.normal(emitIndex, nx, ny, nz);

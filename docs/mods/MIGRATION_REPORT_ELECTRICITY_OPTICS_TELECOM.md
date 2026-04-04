@@ -145,3 +145,31 @@
 ### 二次构建验证（含 Tick 接入）
 - `:fabric-1.16.5:build :fabric-1.18.2:build :fabric-1.20.1:build -x test` 通过
 - `:forge-1.16.5:build :forge-1.18.2:build :forge-1.20.1:build -x test` 通过
+
+## 增量迁移（2026-03-28）
+
+### 新增：Common JVM 自动化回归基线
+- `common/build.gradle.kts`
+  - 新增 JUnit 5 测试依赖与 `useJUnitPlatform()`，使 common 运行时可直接进入 Gradle 自动化验证。
+- 新增测试：
+  - `common/src/test/java/cn/hydcraft/hydronyasama/electricity/runtime/ElectricityMathTest.java`
+  - `common/src/test/java/cn/hydcraft/hydronyasama/electricity/runtime/ElectricityCatenaryTest.java`
+  - `common/src/test/java/cn/hydcraft/hydronyasama/telecom/runtime/TelecomCommServiceTest.java`
+
+### 本轮修复：等高悬链线端点偏移
+- `cn.hydcraft.hydronyasama.electricity.runtime.ElectricityCatenary`
+  - 为 `yFrom == yTo` 的等高悬链线增加专用求解分支。
+  - 修复旧通用公式在 flat span 场景下右端点下坠过大、曲线不对称的问题。
+
+### 本轮自动化覆盖范围
+- Electricity
+  - 验证 `ElectricityMath` 的角度三角函数、反双曲函数与距离计算。
+  - 验证 `ElectricityCatenary` 的 `calcCableLength/calcSpanDistance/apply/derivative` 基础行为。
+- Telecom
+  - 验证 `TelecomCommService` 的 input/output 连线、断开与输出传播。
+  - 验证 `TelecomNgScriptEngine` 的 NSPGA 配置命令链与快照输出。
+  - 验证 `TriStateSignalBox -> RSLatch -> Output` 的基础正/负沿控制链路。
+
+### 本轮构建验证
+- `./gradlew :common:test` 通过
+- `./gradlew buildAllTargets` 待在本轮文档更新后再次执行

@@ -12,6 +12,14 @@ public final class ElectricityCatenary {
   }
 
   public ElectricityCatenary(float yFrom, float yTo, float distance, float drop) {
+    if (Math.abs(yFrom - yTo) < 1e-4F) {
+      FlatSpanSolution solution = solveFlatSpan(yFrom, distance, drop);
+      this.u = solution.u;
+      this.x1 = solution.x1;
+      this.k = solution.k;
+      return;
+    }
+
     float baseY;
     float spanY;
     if (yFrom < yTo) {
@@ -46,6 +54,35 @@ public final class ElectricityCatenary {
     this.u = solvedU;
     this.x1 = solvedX1;
     this.k = solvedK;
+  }
+
+  private static FlatSpanSolution solveFlatSpan(float yLevel, float distance, float drop) {
+    float safeDistance = Math.max(distance, 1e-4F);
+    float safeDrop = Math.max(drop, 1e-4F);
+    double halfSpan = safeDistance / 2.0D;
+    double lower = 1e-4D;
+    double upper = Math.max(1.0D, halfSpan * halfSpan / safeDrop);
+
+    while (sagForScale(upper, halfSpan) > safeDrop) {
+      upper *= 2.0D;
+    }
+
+    for (int i = 0; i < 100; i++) {
+      double current = (lower + upper) / 2.0D;
+      if (sagForScale(current, halfSpan) > safeDrop) {
+        lower = current;
+      } else {
+        upper = current;
+      }
+    }
+
+    double scale = (lower + upper) / 2.0D;
+    return new FlatSpanSolution(
+        (float) (1.0D / scale), safeDistance / 2.0F, (float) (yLevel - safeDrop - scale));
+  }
+
+  private static double sagForScale(double scale, double halfSpan) {
+    return scale * (Math.cosh(halfSpan / scale) - 1.0D);
   }
 
   public float apply(float x) {
@@ -84,5 +121,17 @@ public final class ElectricityCatenary {
     float right =
         ElectricityMath.atanh((spanY * spanY) / (cableLength * (spanY + 2.0F * drop) - q));
     return left * right;
+  }
+
+  private static final class FlatSpanSolution {
+    final float u;
+    final float x1;
+    final float k;
+
+    FlatSpanSolution(float u, float x1, float k) {
+      this.u = u;
+      this.x1 = x1;
+      this.k = k;
+    }
   }
 }

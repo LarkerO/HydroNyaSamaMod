@@ -26,6 +26,8 @@ dependencies {
     compileOnly("io.netty:netty-all:4.1.111.Final")
     compileOnly(files(architecturyJarFile).builtBy(downloadArchitecturyJar))
     compileOnly(files(mtrCommonJar))
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
 java {
@@ -36,4 +38,8 @@ java {
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.release.set(8)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
